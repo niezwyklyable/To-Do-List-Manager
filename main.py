@@ -3,16 +3,25 @@ from task import Task
 import colorama
 from colorama import Fore
 colorama.init(autoreset=True)
-tasks = [] # list of tasks, each task includes at least a target
-# and optionally a deadline or time/date info, a task is an instance of the class Task
-# so surely it could be more attributes and options in it
+import pickle
 
 def main():
     run = True
-    task_counter = 0 # constantly increments to provide the tasks being unique
     print()
     print('Hello, welcome at the To-Do List Manager :)')
     
+    """
+    loading or creating the list of tasks, each task includes at least a target
+    and optionally a deadline or time/date info, a task is an instance of the class Task
+    so surely it could be more attributes and options in it
+    """
+    try:
+        with open('db.pickle', 'rb') as file:
+            tasks = pickle.load(file)
+    except:
+        tasks = []
+        print('No database file has been detected.')
+
     while run:
         print()
         print('1. Show the list of all tasks.')
@@ -34,11 +43,12 @@ def main():
         elif chosen_option == '2':
             target_info = input('Please enter the target info: ').strip()
             if len(target_info) == 0:
-                print(f'{Fore.RED}No info has detected. The task has not been added.')
+                print(f'{Fore.RED}No info has been detected. The task has not been added.')
                 continue
-            task_counter += 1
-            tasks.append(Task(task_counter, target_info))
+            valid_task_number = generate_valid_task_number(tasks)
+            tasks.append(Task(valid_task_number, target_info))
             print(f'{Fore.GREEN}The task has been added to the list properly.')
+            save_to_database(tasks)
 
         # Mark the task as completed
         elif chosen_option == '3':
@@ -51,6 +61,7 @@ def main():
                 if t.task_number == chosen_task_number:
                     t.mark_as_completed()
                     print(f'{Fore.GREEN}Chosen task has been marked as completed.')
+                    save_to_database(tasks)
                     break
             else:
                 print(f'{Fore.RED}Wrong task number.')
@@ -73,18 +84,21 @@ def main():
                     if chosen_option == '1':
                         new_target_info = input(f'{t.target_info} --> ').strip()
                         if len(new_target_info) == 0:
-                            print(f'{Fore.RED}No info has detected. Target info has not changed.')
+                            print(f'{Fore.RED}No info has been detected. Target info has not changed.')
                             break
                         t.change_target_info(new_target_info)
                         print(f'{Fore.GREEN}Target info has changed properly.')
+                        save_to_database(tasks)
                     # Undo the command: mark the task as completed
                     elif chosen_option == '2':
                         t.mark_as_to_do()
                         print(f'{Fore.GREEN}Chosen task has been marked as to-do.')
+                        save_to_database(tasks)
                     # Delete the task from the list
                     elif chosen_option == '3':
                         tasks.remove(t)
                         print(f'{Fore.GREEN}Chosen task has been deleted from the list.')
+                        save_to_database(tasks)
                     else:
                         print(f'{Fore.RED}Not recognized command. Please try again.')
                     break
@@ -96,5 +110,37 @@ def main():
             run = False
         else:
             print(f'{Fore.RED}Not recognized command. Please try again.')
+
+# update the database or create a new one if does not exist yet
+def save_to_database(tasks):
+    try:
+        with open('db.pickle', 'wb') as file:
+            pickle.dump(tasks, file)
+    except:
+        print(f'{Fore.RED}Failed to save the tasks to database.')
+
+# generate a valid (first positive free) task number for a new task in order to safely add it to the list
+def generate_valid_task_number(tasks):
+    number_of_all_tasks = len(tasks)
+    # if there is no tasks, the first task's number should be 1
+    if number_of_all_tasks == 0:
+        return 1
+
+    temp_task_number_list = []
+    for t in tasks:
+        temp_task_number_list.append(t.task_number)
+
+    highest_task_number = max(temp_task_number_list)
+    # if number of all tasks is equal to the highest task number it means that everything is ordered
+    if highest_task_number == number_of_all_tasks:
+        return highest_task_number + 1
+
+    # if number of all task is lesser than the highest task number it means there is a hole somewhere between the int numbers
+    temp_task_number_list.sort()
+    i = 1
+    for tn in temp_task_number_list:
+        if i < tn:
+            return i
+        i += 1
 
 main()

@@ -14,7 +14,7 @@ class Task():
             color = Fore.CYAN
         elif self.state == 'completed':
             color = Fore.BLUE
-        print(f'{color}Task no. {self.task_number}: {self.target_info} | [{self.state}]')
+        print(f'{color}Task #{self.task_number}: {self.target_info} | [{self.state}]')
 
     def mark_as_completed(self):
         self.state = 'completed'
