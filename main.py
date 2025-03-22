@@ -4,6 +4,7 @@ import colorama
 from colorama import Fore
 colorama.init(autoreset=True)
 import pickle
+import re
 
 def main():
     run = True
@@ -49,7 +50,7 @@ def main():
             date = input('Please set the date (dd.mm.yyyy): ').strip()
             # without date
             if len(date) == 0:
-                assigned_day = input('Please assign day of the week (mon/tue/wed/thu/fri/sat/sun): ').strip()
+                assigned_day = input('Please assign day of the week (mon/tue/wed/thu/fri/sat/sun): ').strip().lower()
                 # no assigned day
                 if len(assigned_day) == 0:
                     tasks.append(Task(valid_task_number, target_info, date=None, assigned_day=None))
@@ -57,7 +58,10 @@ def main():
                     save_to_database(tasks)
                     continue
                 # assigned day of the week
-                periodic = input('Is it periodic? (y/n): ').strip()
+                if not re.fullmatch('mon|tue|wed|thu|fri|sat|sun', assigned_day):
+                    print(f'{Fore.RED}Wrong input.')
+                    continue
+                periodic = input('Is it periodic? (y/n): ').strip().lower()
                 # periodic
                 if periodic == 'y':
                     time = input('Please set the time (hh:mm): ').strip()
@@ -68,6 +72,9 @@ def main():
                         save_to_database(tasks)
                         continue
                     # set the time
+                    if not re.fullmatch('1?[0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]', time):
+                        print(f'{Fore.RED}Wrong input.')
+                        continue
                     tasks.append(Task(valid_task_number, target_info, date=None, assigned_day=assigned_day, periodic=True, time=time))
                     print(f'{Fore.GREEN}The task has been added to the list properly.')
                     save_to_database(tasks)
@@ -81,6 +88,9 @@ def main():
                         save_to_database(tasks)
                         continue
                     # set the time
+                    if not re.fullmatch('1?[0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]', time):
+                        print(f'{Fore.RED}Wrong input.')
+                        continue
                     tasks.append(Task(valid_task_number, target_info, date=None, assigned_day=assigned_day, periodic=False, time=time))
                     print(f'{Fore.GREEN}The task has been added to the list properly.')
                     save_to_database(tasks)
@@ -92,7 +102,7 @@ def main():
                 # without time
                 if len(time) == 0:
                     # deadline or event type
-                    task_type = input('Please define the task typ (deadline/event): ').strip()
+                    task_type = input('Please define the task typ (deadline/event): ').strip().lower()
                     if task_type == 'deadline' or task_type == 'event':
                         tasks.append(Task(valid_task_number, target_info, date=date, assigned_day=None, periodic=False, time=None, task_type=task_type))
                         print(f'{Fore.GREEN}The task has been added to the list properly.')
@@ -101,8 +111,11 @@ def main():
                         print(f'{Fore.RED}Wrong input.')
                     continue
                 # set the time
+                if not re.fullmatch('1?[0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]', time):
+                    print(f'{Fore.RED}Wrong input.')
+                    continue
                 # deadline or event type
-                task_type = input('Please define the task typ (deadline/event): ').strip()
+                task_type = input('Please define the task typ (deadline/event): ').strip().lower()
                 if task_type == 'deadline' or task_type == 'event':
                     tasks.append(Task(valid_task_number, target_info, date=date, assigned_day=None, periodic=False, time=time, task_type=task_type))
                     print(f'{Fore.GREEN}The task has been added to the list properly.')
