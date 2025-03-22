@@ -96,8 +96,28 @@ def main():
                     save_to_database(tasks)
                 else:
                     print(f'{Fore.RED}Wrong input.')
-            # set the date
             else:
+                # set the date
+                if not re.fullmatch(r'''[0][1-9]\.[0][13578]\.2[01][0-9][0-9]| # 01-09.Jan,Mar,May,Jul,Aug.2000-2199
+                                    [12][0-9]\.[0][13578]\.2[01][0-9][0-9]| # 10-29.Jan,Mar,May,Jul,Aug.2000-2199
+                                    3[01]\.[0][13578]\.2[01][0-9][0-9]| # 30-31.Jan,Mar,May,Jul,Aug.2000-2199
+                                    [0][1-9]\.1[02]\.2[01][0-9][0-9]| # 01-09.Oct,Dec.2000-2199
+                                    [12][0-9]\.1[02]\.2[01][0-9][0-9]| # 10-29.Oct,Dec.2000-2199
+                                    3[01]\.1[02]\.2[01][0-9][0-9]| # 30-31.Oct,Dec.2000-2199
+                                    [0][1-9]\.[0][469]\.2[01][0-9][0-9]| # 01-09.Apr,Jun,Sep.2000-2199
+                                    [12][0-9]\.[0][469]\.2[01][0-9][0-9]| # 10-29.Apr,Jun,Sep.2000-2199
+                                    30\.[0][469]\.2[01][0-9][0-9]| # 30.Apr,Jun,Sep.2000-2199
+                                    [0][1-9]\.11\.2[01][0-9][0-9]| # 01-09.Nov.2000-2199
+                                    [12][0-9]\.11\.2[01][0-9][0-9]| # 10-29.Nov.2000-2199
+                                    30\.11\.2[01][0-9][0-9]| # 30.Nov.2000-2199
+                                    [0][1-9]\.02\.2[01][0-9][0-9]| # 01-09.Feb.2000-2199
+                                    [12][0-9]\.02\.2[01][0-9][0-9]''', date, re.X): # 10-29.Feb.2000-2199
+                    # re.X flag allows to correctly save the pattern str in a multiline mode ('''str''') and a raw str mode allows to comment between the lines
+                    print(f'{Fore.RED}Wrong input.')
+                    continue
+                if not last_day_of_february_is_valid(date):
+                    print(f'{Fore.RED}Wrong input. February 29 does not exist in that year.')
+                    continue
                 time = input('Please set the time (hh:mm): ').strip()
                 # without time
                 if len(time) == 0:
@@ -215,5 +235,13 @@ def generate_valid_task_number(tasks):
         if i < tn:
             return i
         i += 1
+
+def last_day_of_february_is_valid(date):
+    day, month, year = date.split('.')
+    if day == '29' and month == '02':
+        if int(year)%4 == 0 and int(year)%100 != 0 or int(year)%400 == 0:
+            return True # February 29 is valid
+        return False # February 29 is not valid
+    return True # not concern February 29
 
 main()
