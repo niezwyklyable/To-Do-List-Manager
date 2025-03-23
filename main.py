@@ -38,44 +38,40 @@ def main():
                 print('The list of tasks is empty.')
                 continue
             print()
+            temp_filtered_tasks = []
             for t in tasks:
                 if t.assigned_day == None:
-                    t.show_info()
+                    if t.date == None:
+                        t.show_info() # show tasks without date and have no assigned day firstly
+                    else:
+                        temp_filtered_tasks.append(t) # append tasks which have no assigned day but have be set a date
+            sorted_temp_filtered_tasks_by_day = sorted(temp_filtered_tasks, key=lambda t: t.get_date()[0], reverse=True)
+            sorted_temp_filtered_tasks_by_month = sorted(sorted_temp_filtered_tasks_by_day, key=lambda t: t.get_date()[1], reverse=True)
+            sorted_temp_filtered_tasks_by_year = sorted(sorted_temp_filtered_tasks_by_month, key=lambda t: t.get_date()[2], reverse=True)
+            # show sorted descending tasks with a date
+            for t in sorted_temp_filtered_tasks_by_year:
+                t.show_info()
             print()
             print('MONDAY:')
-            for t in tasks:
-                if t.assigned_day == 'mon':
-                    t.show_info()
+            show_tasks_on_specific_day('mon', tasks)
             print()
             print('TUESDAY:')
-            for t in tasks:
-                if t.assigned_day == 'tue':
-                    t.show_info()
+            show_tasks_on_specific_day('tue', tasks)
             print()
             print('WEDNESDAY:')
-            for t in tasks:
-                if t.assigned_day == 'wed':
-                    t.show_info()
+            show_tasks_on_specific_day('wed', tasks)
             print()
             print('THURSDAY:')
-            for t in tasks:
-                if t.assigned_day == 'thu':
-                    t.show_info()
+            show_tasks_on_specific_day('thu', tasks)
             print()
             print('FRIDAY:')
-            for t in tasks:
-                if t.assigned_day == 'fri':
-                    t.show_info()
+            show_tasks_on_specific_day('fri', tasks)
             print()
             print('SATURDAY:')
-            for t in tasks:
-                if t.assigned_day == 'sat':
-                    t.show_info()
+            show_tasks_on_specific_day('sat', tasks)
             print()
             print('SUNDAY:')
-            for t in tasks:
-                if t.assigned_day == 'sun':
-                    t.show_info()
+            show_tasks_on_specific_day('sun', tasks)
 
         # Add a new task to the list
         elif chosen_option == '2':
@@ -280,5 +276,19 @@ def last_day_of_february_is_valid(date):
             return True # February 29 is valid
         return False # February 29 is not valid
     return True # not concern February 29
+
+def show_tasks_on_specific_day(day_str, tasks):
+    temp_filtered_tasks = []
+    for t in tasks:
+        if t.assigned_day == day_str:
+            if t.time == None:
+                t.show_info() # show tasks without time firstly
+            else:
+                temp_filtered_tasks.append(t) # append tasks which have assigned day but have be set time
+    sorted_temp_filtered_tasks_by_minutes = sorted(temp_filtered_tasks, key=lambda t: t.get_time()[1])
+    sorted_temp_filtered_tasks_by_hours = sorted(sorted_temp_filtered_tasks_by_minutes, key=lambda t: t.get_time()[0])
+    # show sorted ascending tasks with time
+    for t in sorted_temp_filtered_tasks_by_hours:
+        t.show_info()
 
 main()

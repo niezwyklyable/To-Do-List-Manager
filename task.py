@@ -58,3 +58,12 @@ class Task():
 
     def change_target_info(self, new_target_info):
         self.target_info = new_target_info
+
+    def get_date(self):
+        day, month, year = self.date.split('.')
+        return int(day), int(month), int(year)
+    
+    def get_time(self):
+        hours, minutes = self.time.split(':')
+        return int(hours), int(minutes)
+    
