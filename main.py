@@ -37,8 +37,45 @@ def main():
             if len(tasks) == 0:
                 print('The list of tasks is empty.')
                 continue
+            print()
             for t in tasks:
-                t.show_info()
+                if t.assigned_day == None:
+                    t.show_info()
+            print()
+            print('MONDAY:')
+            for t in tasks:
+                if t.assigned_day == 'mon':
+                    t.show_info()
+            print()
+            print('TUESDAY:')
+            for t in tasks:
+                if t.assigned_day == 'tue':
+                    t.show_info()
+            print()
+            print('WEDNESDAY:')
+            for t in tasks:
+                if t.assigned_day == 'wed':
+                    t.show_info()
+            print()
+            print('THURSDAY:')
+            for t in tasks:
+                if t.assigned_day == 'thu':
+                    t.show_info()
+            print()
+            print('FRIDAY:')
+            for t in tasks:
+                if t.assigned_day == 'fri':
+                    t.show_info()
+            print()
+            print('SATURDAY:')
+            for t in tasks:
+                if t.assigned_day == 'sat':
+                    t.show_info()
+            print()
+            print('SUNDAY:')
+            for t in tasks:
+                if t.assigned_day == 'sun':
+                    t.show_info()
 
         # Add a new task to the list
         elif chosen_option == '2':
