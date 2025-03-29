@@ -22,6 +22,10 @@ class Task():
             color = Fore.CYAN
         elif self.state == 'completed':
             color = Fore.BLUE
+        # inactive task (periodic without time only)
+        if not self.active:
+            print(f'Task #{self.task_number}: {self.target_info} | [inactive]')
+            return
         # with date
         if self.date:
             # with time
@@ -104,7 +108,15 @@ class Task():
                     self.assigned_day=assigned_day
                     self.periodic = True
                     self.time = None
-                    self.active = True
+                    active = input('Is it active? (y/n): ').strip().lower()
+                    # check if it is active
+                    if active == 'y':
+                        self.active = True
+                    elif active == 'n':
+                        self.active = False
+                    else:
+                        print(f'{Fore.RED}Wrong input.')
+                        return False
                     print(f'{Fore.GREEN}The task has been modified properly.')
                     return True
                 # set the time
