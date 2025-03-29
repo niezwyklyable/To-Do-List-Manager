@@ -2,6 +2,7 @@
 import colorama
 from colorama import Fore
 colorama.init(autoreset=True)
+import re
 
 class Task():
     def __init__(self, task_number, target_info, date=None, assigned_day=None, \
@@ -67,3 +68,136 @@ class Task():
         hours, minutes = self.time.split(':')
         return int(hours), int(minutes)
     
+    def last_day_of_february_is_valid(self, date):
+        day, month, year = date.split('.')
+        if day == '29' and month == '02':
+            if int(year)%4 == 0 and int(year)%100 != 0 or int(year)%400 == 0:
+                return True # February 29 is valid
+            return False # February 29 is not valid
+        return True # not concern February 29
+
+    def change_parameters(self):
+        date = input('Please set the date (dd.mm.yyyy): ').strip()
+        # without date
+        if len(date) == 0:
+            assigned_day = input('Please assign day of the week (mon/tue/wed/thu/fri/sat/sun): ').strip().lower()
+            # no assigned day
+            if len(assigned_day) == 0:
+                self.date=None
+                self.assigned_day=None
+                self.periodic = False
+                self.time = None
+                self.active = True
+                print(f'{Fore.GREEN}The task has been modified properly.')
+                return True
+            # assigned day of the week
+            if not re.fullmatch('mon|tue|wed|thu|fri|sat|sun', assigned_day):
+                print(f'{Fore.RED}Wrong input.')
+                return False
+            periodic = input('Is it periodic? (y/n): ').strip().lower()
+            # periodic
+            if periodic == 'y':
+                time = input('Please set the time (hh:mm): ').strip()
+                # without time
+                if len(time) == 0:
+                    self.date=None
+                    self.assigned_day=assigned_day
+                    self.periodic = True
+                    self.time = None
+                    self.active = True
+                    print(f'{Fore.GREEN}The task has been modified properly.')
+                    return True
+                # set the time
+                if not re.fullmatch('1?[0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]', time):
+                    print(f'{Fore.RED}Wrong input.')
+                    return False
+                self.date=None
+                self.assigned_day=assigned_day
+                self.periodic = True
+                self.time = time
+                self.active = True
+                print(f'{Fore.GREEN}The task has been modified properly.')
+                return True
+            # no periodic
+            elif periodic == 'n':
+                time = input('Please set the time (hh:mm): ').strip()
+                # without time
+                if len(time) == 0:
+                    self.date=None
+                    self.assigned_day=assigned_day
+                    self.periodic = False
+                    self.time = None
+                    self.active = True
+                    print(f'{Fore.GREEN}The task has been modified properly.')
+                    return True
+                # set the time
+                if not re.fullmatch('1?[0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]', time):
+                    print(f'{Fore.RED}Wrong input.')
+                    return False
+                self.date=None
+                self.assigned_day=assigned_day
+                self.periodic = False
+                self.time = time
+                self.active = True
+                print(f'{Fore.GREEN}The task has been modified properly.')
+                return True
+            else:
+                print(f'{Fore.RED}Wrong input.')
+                return False
+        else:
+            # set the date
+            if not re.fullmatch(r'''[0][1-9]\.[0][13578]\.2[01][0-9][0-9]| # 01-09.Jan,Mar,May,Jul,Aug.2000-2199
+                                [12][0-9]\.[0][13578]\.2[01][0-9][0-9]| # 10-29.Jan,Mar,May,Jul,Aug.2000-2199
+                                3[01]\.[0][13578]\.2[01][0-9][0-9]| # 30-31.Jan,Mar,May,Jul,Aug.2000-2199
+                                [0][1-9]\.1[02]\.2[01][0-9][0-9]| # 01-09.Oct,Dec.2000-2199
+                                [12][0-9]\.1[02]\.2[01][0-9][0-9]| # 10-29.Oct,Dec.2000-2199
+                                3[01]\.1[02]\.2[01][0-9][0-9]| # 30-31.Oct,Dec.2000-2199
+                                [0][1-9]\.[0][469]\.2[01][0-9][0-9]| # 01-09.Apr,Jun,Sep.2000-2199
+                                [12][0-9]\.[0][469]\.2[01][0-9][0-9]| # 10-29.Apr,Jun,Sep.2000-2199
+                                30\.[0][469]\.2[01][0-9][0-9]| # 30.Apr,Jun,Sep.2000-2199
+                                [0][1-9]\.11\.2[01][0-9][0-9]| # 01-09.Nov.2000-2199
+                                [12][0-9]\.11\.2[01][0-9][0-9]| # 10-29.Nov.2000-2199
+                                30\.11\.2[01][0-9][0-9]| # 30.Nov.2000-2199
+                                [0][1-9]\.02\.2[01][0-9][0-9]| # 01-09.Feb.2000-2199
+                                [12][0-9]\.02\.2[01][0-9][0-9]''', date, re.X): # 10-29.Feb.2000-2199
+                # re.X flag allows to correctly save the pattern str in a multiline mode ('''str''') and a raw str mode allows to comment between the lines
+                print(f'{Fore.RED}Wrong input.')
+                return False
+            if not self.last_day_of_february_is_valid(date):
+                print(f'{Fore.RED}Wrong input. February 29 does not exist in that year.')
+                return False
+            time = input('Please set the time (hh:mm): ').strip()
+            # without time
+            if len(time) == 0:
+                # deadline or event type
+                task_type = input('Please define the task typ (deadline/event): ').strip().lower()
+                if task_type == 'deadline' or task_type == 'event':
+                    self.date=date
+                    self.assigned_day=None
+                    self.periodic = False
+                    self.time = None
+                    self.active = True
+                    self.task_type = task_type
+                    print(f'{Fore.GREEN}The task has been modified properly.')
+                    return True                   
+                else:
+                    print(f'{Fore.RED}Wrong input.')
+                    return False
+            # set the time
+            if not re.fullmatch('1?[0-9]:[0-5][0-9]|2[0-3]:[0-5][0-9]', time):
+                print(f'{Fore.RED}Wrong input.')
+                return False
+            # deadline or event type
+            task_type = input('Please define the task typ (deadline/event): ').strip().lower()
+            if task_type == 'deadline' or task_type == 'event':
+                    self.date=date
+                    self.assigned_day=None
+                    self.periodic = False
+                    self.time = time
+                    self.active = True
+                    self.task_type = task_type
+                    print(f'{Fore.GREEN}The task has been modified properly.')
+                    return True                   
+            else:
+                print(f'{Fore.RED}Wrong input.')
+                return False

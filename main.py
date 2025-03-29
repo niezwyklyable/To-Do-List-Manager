@@ -203,8 +203,9 @@ def main():
                 if t.task_number == chosen_task_number:
                     print('What do you want to do with the chosen task?')
                     print('1. Change the target info.')
-                    print('2. Undo the command: mark the task as completed.')
-                    print('3. Delete the task from the list.')
+                    print('2. Change the parameters.')
+                    print('3. Undo the command: mark the task as completed.')
+                    print('4. Delete the task from the list.')
                     chosen_option = input('Please choose the command: ').strip()
                     # Change the target info
                     if chosen_option == '1':
@@ -215,13 +216,18 @@ def main():
                         t.change_target_info(new_target_info)
                         print(f'{Fore.GREEN}Target info has changed properly.')
                         save_to_database(tasks)
+                    # Change the parameters
+                    if chosen_option == '2':
+                        is_properly_modified = t.change_parameters()
+                        if is_properly_modified:
+                            save_to_database(tasks)
                     # Undo the command: mark the task as completed
-                    elif chosen_option == '2':
+                    elif chosen_option == '3':
                         t.mark_as_to_do()
                         print(f'{Fore.GREEN}Chosen task has been marked as to-do.')
                         save_to_database(tasks)
                     # Delete the task from the list
-                    elif chosen_option == '3':
+                    elif chosen_option == '4':
                         tasks.remove(t)
                         print(f'{Fore.GREEN}Chosen task has been deleted from the list.')
                         save_to_database(tasks)
