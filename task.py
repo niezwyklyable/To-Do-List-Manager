@@ -18,14 +18,16 @@ class Task():
         self.active = active # boolean type
 
     def show_info(self):
-        if self.state == 'to-do':
-            color = Fore.CYAN
-        elif self.state == 'completed':
-            color = Fore.BLUE
         # inactive task (periodic without time only)
         if not self.active:
             print(f'Task #{self.task_number}: {self.target_info} | [inactive]')
             return
+        
+        # active task color settings
+        if self.state == 'to-do':
+            color = Fore.CYAN
+        elif self.state == 'completed':
+            color = Fore.BLUE
         # with date
         if self.date:
             # with time
@@ -71,6 +73,14 @@ class Task():
     def get_time(self):
         hours, minutes = self.time.split(':')
         return int(hours), int(minutes)
+    
+    def get_state(self):
+        if not self.active:
+            return 0
+        elif self.state == 'completed':
+            return 1
+        elif self.state == 'to-do':
+            return 2
     
     def last_day_of_february_is_valid(self, date):
         day, month, year = date.split('.')

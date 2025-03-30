@@ -284,17 +284,23 @@ def last_day_of_february_is_valid(date):
     return True # not concern February 29
 
 def show_tasks_on_specific_day(day_str, tasks):
-    temp_filtered_tasks = []
+    temp_filtered_tasks = [] # with time
+    temp_filtered_tasks_without_time = []
     for t in tasks:
         if t.assigned_day == day_str:
             if t.time == None:
-                t.show_info() # show tasks without time firstly
+                temp_filtered_tasks_without_time.append(t) # append tasks which have assigned day and without time
             else:
-                temp_filtered_tasks.append(t) # append tasks which have assigned day but have be set time
+                temp_filtered_tasks.append(t) # append tasks which have assigned day and have be set time
+    # sort tasks with time only by time
     sorted_temp_filtered_tasks_by_minutes = sorted(temp_filtered_tasks, key=lambda t: t.get_time()[1])
     sorted_temp_filtered_tasks_by_hours = sorted(sorted_temp_filtered_tasks_by_minutes, key=lambda t: t.get_time()[0])
-    # show sorted ascending tasks with time
-    for t in sorted_temp_filtered_tasks_by_hours:
+    # concatenate two lists in specific order (tasks without time and tasks with time)
+    sorted_temp_filtered_tasks = temp_filtered_tasks_without_time + sorted_temp_filtered_tasks_by_hours
+    # sort all tasks by state (inactive/completed/to-do)
+    sorted_temp_filtered_tasks_by_state = sorted(sorted_temp_filtered_tasks, key=lambda t: t.get_state())
+    # show sorted ascending tasks without time and with time by state
+    for t in sorted_temp_filtered_tasks_by_state:
         t.show_info()
 
 main()
