@@ -223,3 +223,7 @@ class Task():
             else:
                 print(f'{Fore.RED}Wrong input.')
                 return False
+
+    def move_to_specific_assigned_day(self, assigned_day):
+        self.date=None
+        self.assigned_day=assigned_day

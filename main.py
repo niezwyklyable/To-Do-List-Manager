@@ -5,6 +5,7 @@ from colorama import Fore
 colorama.init(autoreset=True)
 import pickle
 import re
+from datetime import datetime
 
 def main():
     run = True
@@ -24,6 +25,10 @@ def main():
         print('No database file has been detected.')
 
     while run:
+        # assign the task(s) with a date to the specific weekday when the specific week comes (automatic process)
+        datetime_obj = datetime.now()
+        automatic_assigning_day(datetime_obj, tasks)
+
         print()
         print('1. Show the list of all tasks.')
         print('2. Add a new task to the list.')
@@ -302,5 +307,24 @@ def show_tasks_on_specific_day(day_str, tasks):
     # show sorted ascending tasks without time and with time by state
     for t in sorted_temp_filtered_tasks_by_state:
         t.show_info()
+
+def automatic_assigning_day(datetime_obj, tasks):
+    current_week_num = datetime_obj.strftime("%W") # Week number of year, Monday as the first day of week, 00-53
+    temp_counter = 0
+    for t in tasks:
+        if t.date:
+            temp_datetime_obj = datetime(t.get_date()[2], t.get_date()[1], t.get_date()[0])
+            if temp_datetime_obj.strftime("%W") == current_week_num:
+                assigned_day = temp_datetime_obj.strftime("%a").lower()
+                t.move_to_specific_assigned_day(assigned_day)
+                temp_counter += 1
+    
+    if temp_counter == 1:
+        print(f'{Fore.GREEN}One task has been assigned to the specific day successfully.')
+    elif temp_counter > 1:
+        print(f'{Fore.GREEN}{temp_counter} tasks have been assigned to the specific day successfully.')
+
+    if temp_counter > 0:
+        save_to_database(tasks)
 
 main()
