@@ -310,11 +310,13 @@ def show_tasks_on_specific_day(day_str, tasks):
 
 def automatic_assigning_day(datetime_obj, tasks):
     current_week_num = datetime_obj.strftime("%W") # Week number of year, Monday as the first day of week, 00-53
+    current_year = datetime_obj.strftime("%Y") # yyyy str format
     temp_counter = 0
     for t in tasks:
         if t.date:
             temp_datetime_obj = datetime(t.get_date()[2], t.get_date()[1], t.get_date()[0])
-            if temp_datetime_obj.strftime("%W") == current_week_num:
+            if temp_datetime_obj.strftime("%W") == current_week_num and \
+                temp_datetime_obj.strftime("%Y") == current_year:
                 assigned_day = temp_datetime_obj.strftime("%a").lower()
                 t.move_to_specific_assigned_day(assigned_day)
                 temp_counter += 1
