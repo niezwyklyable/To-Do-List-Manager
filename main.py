@@ -25,10 +25,10 @@ def main():
         print('No database file has been detected.')
 
     while run:
-        # assign the task(s) with a date to the specific weekday when the specific week comes (automatic process)
-        datetime_obj = datetime.now()
-        automatic_assigning_day(datetime_obj, tasks)
-        automatic_task_marking(datetime_obj, tasks)
+        # datetime stuff
+        datetime_obj = datetime.now() # get the datetime data from the system
+        automatic_weekday_assigning(datetime_obj, tasks) # assign the task(s) with a date to the specific weekday when the specific week comes (automatic process)
+        automatic_task_marking(datetime_obj, tasks) # mark periodic completed task(s) as 'to-do' when the next day (different day) comes (automatic process)
 
         print()
         print('1. Show the list of all tasks.')
@@ -309,16 +309,16 @@ def show_tasks_on_specific_day(day_str, tasks):
     for t in sorted_temp_filtered_tasks_by_state:
         t.show_info()
 
-def automatic_assigning_day(datetime_obj, tasks):
+def automatic_weekday_assigning(datetime_obj, tasks):
     current_week_num = datetime_obj.strftime("%W") # Week number of year, Monday as the first day of week, 00-53
     current_year = datetime_obj.strftime("%Y") # yyyy str format
     temp_counter = 0
     for t in tasks:
         if t.date:
-            temp_datetime_obj = datetime(t.get_date()[2], t.get_date()[1], t.get_date()[0])
+            temp_datetime_obj = datetime(t.get_date()[2], t.get_date()[1], t.get_date()[0]) # temporarily create an datetime object based on the task date
             if temp_datetime_obj.strftime("%W") == current_week_num and \
                 temp_datetime_obj.strftime("%Y") == current_year:
-                assigned_day = temp_datetime_obj.strftime("%a").lower()
+                assigned_day = temp_datetime_obj.strftime("%a").lower() # short version of weekday, str format
                 t.move_to_specific_assigned_day(assigned_day)
                 temp_counter += 1
     
