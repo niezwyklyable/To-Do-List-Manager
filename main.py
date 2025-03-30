@@ -28,6 +28,7 @@ def main():
         # assign the task(s) with a date to the specific weekday when the specific week comes (automatic process)
         datetime_obj = datetime.now()
         automatic_assigning_day(datetime_obj, tasks)
+        automatic_task_marking(datetime_obj, tasks)
 
         print()
         print('1. Show the list of all tasks.')
@@ -325,6 +326,22 @@ def automatic_assigning_day(datetime_obj, tasks):
         print(f'{Fore.GREEN}One task has been assigned to the specific day successfully.')
     elif temp_counter > 1:
         print(f'{Fore.GREEN}{temp_counter} tasks have been assigned to the specific day successfully.')
+
+    if temp_counter > 0:
+        save_to_database(tasks)
+
+def automatic_task_marking(datetime_obj, tasks):
+    current_weekday = datetime_obj.strftime("%a").lower() # short version of weekday, str format
+    temp_counter = 0
+    for t in tasks:
+        if t.periodic and t.active and t.state == 'completed' and t.assigned_day != current_weekday:
+            t.mark_as_to_do()
+            temp_counter += 1
+
+    if temp_counter == 1:
+        print(f'{Fore.GREEN}One periodic task has been marked as to-do successfully.')
+    elif temp_counter > 1:
+        print(f'{Fore.GREEN}{temp_counter} periodic tasks have been marked as to-do successfully.')
 
     if temp_counter > 0:
         save_to_database(tasks)
