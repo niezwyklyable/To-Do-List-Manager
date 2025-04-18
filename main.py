@@ -6,6 +6,9 @@ colorama.init(autoreset=True)
 import pickle
 import re
 from datetime import datetime
+import pygame
+from my_calendar import Calendar
+from constants import FPS, WIDTH, HEIGHT
 
 def main():
     run = True
@@ -35,7 +38,8 @@ def main():
         print('2. Add a new task to the list.')
         print('3. Mark the task as completed.')
         print('4. Modify the task.')
-        print('5. Exit.')
+        print('5. Launch the calendar.')
+        print('6. Exit.')
         chosen_option = input('Please choose the command: ').strip()
 
         # Show the list of all tasks
@@ -243,8 +247,15 @@ def main():
             else:
                 print(f'{Fore.RED}Wrong task number.')
 
-        # Exit the app
+        # Launch the calendar
         elif chosen_option == '5':
+            WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+            pygame.display.set_caption('To-Do List Manager - GUI')
+            pygame.init()
+            calendar_loop(WIN)
+
+        # Exit the app
+        elif chosen_option == '6':
             run = False
         else:
             print(f'{Fore.RED}Not recognized command. Please try again.')
@@ -345,5 +356,23 @@ def automatic_task_marking(datetime_obj, tasks):
 
     if temp_counter > 0:
         save_to_database(tasks)
+
+# GUI
+def calendar_loop(WIN):
+    clock = pygame.time.Clock()
+    run = True
+    calendar = Calendar(WIN)
+    while run:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                print(pos)
+
+        calendar.render()
+
+    pygame.quit()
 
 main()
