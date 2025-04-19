@@ -8,7 +8,9 @@ import re
 from datetime import datetime
 import pygame
 from my_calendar import Calendar
-from constants import FPS, WIDTH, HEIGHT
+from constants import FPS, WIDTH, HEIGHT, UP_ARROW_LEFT_VERTEX, UP_ARROW_MIDDLE_VERTEX, \
+      UP_ARROW_RIGHT_VERTEX, DOWN_ARROW_LEFT_VERTEX, DOWN_ARROW_MIDDLE_VERTEX, \
+        DOWN_ARROW_RIGHT_VERTEX
 
 def main():
     run = True
@@ -368,8 +370,17 @@ def calendar_loop(WIN):
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                print(pos)
+                if pygame.mouse.get_pressed(3)[0]:
+                    pos_x, pos_y = pygame.mouse.get_pos()
+                    #print((pos_x, pos_y))
+                    if pos_x >= UP_ARROW_LEFT_VERTEX[0] and pos_x <= UP_ARROW_RIGHT_VERTEX[0] \
+                    and pos_y >= UP_ARROW_MIDDLE_VERTEX[1] and pos_y <= UP_ARROW_LEFT_VERTEX[1]:
+                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_month(next=False)
+                    if pos_x >= DOWN_ARROW_LEFT_VERTEX[0] and pos_x <= DOWN_ARROW_RIGHT_VERTEX[0] \
+                    and pos_y >= DOWN_ARROW_LEFT_VERTEX[1] and pos_y <= DOWN_ARROW_MIDDLE_VERTEX[1]:
+                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_month()
 
         calendar.render()
 
