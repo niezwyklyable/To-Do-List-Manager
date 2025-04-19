@@ -3,7 +3,7 @@ import pygame
 from datetime import datetime
 from constants import BOARD_SIZE, GAP, WHITE, BLACK, MARGIN, HEIGHT, WIDTH, BLUE, TILE_SIZE, \
 UP_ARROW_LEFT_VERTEX, UP_ARROW_MIDDLE_VERTEX, UP_ARROW_RIGHT_VERTEX, DOWN_ARROW_LEFT_VERTEX, \
-DOWN_ARROW_MIDDLE_VERTEX, DOWN_ARROW_RIGHT_VERTEX
+DOWN_ARROW_MIDDLE_VERTEX, DOWN_ARROW_RIGHT_VERTEX, BIG_TILE_SIZE
 
 class Calendar():
     def __init__(self, win):
@@ -16,6 +16,7 @@ class Calendar():
         self.chosen_year = self.current_year
         self.chosen_month = self.current_month
         self.chosen_day = None
+        self.description_dims = (0, 0)
         self.chosen_month_obj_list = []
         if self.chosen_year and self.chosen_month and not self.chosen_day:
             self.generate_chosen_month()
@@ -50,9 +51,20 @@ class Calendar():
                                      chosen_datetime_obj.strftime("%Y"), 1, BLACK)
             self.win.blit(month_and_year, (int(MARGIN + GAP), \
                     int(HEIGHT - WIDTH - month_and_year.get_height())))
+            self.description_dims = (month_and_year.get_width(), month_and_year.get_height())
             # draw the content inside the board if a specific month has been chosen
             self.draw_chosen_month()
         
+        if self.chosen_year and not self.chosen_month and not self.chosen_day:
+            # draw the content above the board if a specific year has been chosen
+            font = pygame.font.SysFont('comicsans', 22)
+            year = font.render(str(self.chosen_year), 1, BLACK)
+            self.win.blit(year, (int(MARGIN + GAP), \
+                    int(HEIGHT - WIDTH - year.get_height())))
+            self.description_dims = (year.get_width(), year.get_height())
+            # draw the content inside the board if a specific year has been chosen
+            self.draw_all_months()
+
         pygame.display.update()
 
     def draw_chosen_month(self):
@@ -118,3 +130,42 @@ class Calendar():
             else:
                 self.chosen_month -= 1
         self.generate_chosen_month()
+
+    def generate_months(self):
+        self.chosen_month = None
+
+    def draw_all_months(self):
+        month_num_list = [(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)]
+        font = pygame.font.SysFont('comicsans', 22)
+        for j in range(3):
+            for i in range(4):
+                # highlight the current month in the chosen (and also current) year
+                if self.chosen_year == self.current_year and \
+                    month_num_list[j][i] == self.current_month: 
+                    color = BLUE
+                else:
+                    color = BLACK
+                pygame.draw.rect(self.win, color, (MARGIN + GAP + i*(BIG_TILE_SIZE+GAP), \
+                    HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP), \
+                    BIG_TILE_SIZE, BIG_TILE_SIZE), width=1)
+                month = font.render(datetime(self.chosen_year, month_num_list[j][i], 1).strftime("%b"), 1, color) # Month name, short version
+                self.win.blit(month, (int(MARGIN + GAP + i*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE / 2 - month.get_width() / 2), \
+                    int(HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE / 2 - month.get_height() / 2)))
+
+    def change_chosen_year(self, next=True):
+        if next:
+            self.chosen_year += 1
+        else: # previous year
+            self.chosen_year -= 1
+
+    def choose_month(self, pos_x, pos_y):
+        month_num_list = [(1, 2, 3, 4), (5, 6, 7, 8), (9, 10, 11, 12)]
+        for j in range(3):
+            for i in range(4):
+                if pos_x >= MARGIN + GAP + i*(BIG_TILE_SIZE+GAP) and \
+                pos_x <= MARGIN + (i+1)*(BIG_TILE_SIZE+GAP) and \
+                pos_y >= HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP) and \
+                pos_y <= HEIGHT - WIDTH + MARGIN + (j+1)*(BIG_TILE_SIZE+GAP):
+                    self.chosen_month = month_num_list[j][i]
+                    self.generate_chosen_month()
+                    return

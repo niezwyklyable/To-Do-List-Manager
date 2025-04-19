@@ -10,7 +10,7 @@ import pygame
 from my_calendar import Calendar
 from constants import FPS, WIDTH, HEIGHT, UP_ARROW_LEFT_VERTEX, UP_ARROW_MIDDLE_VERTEX, \
       UP_ARROW_RIGHT_VERTEX, DOWN_ARROW_LEFT_VERTEX, DOWN_ARROW_MIDDLE_VERTEX, \
-        DOWN_ARROW_RIGHT_VERTEX
+        DOWN_ARROW_RIGHT_VERTEX, MARGIN, GAP, BIG_TILE_SIZE
 
 def main():
     run = True
@@ -373,14 +373,30 @@ def calendar_loop(WIN):
                 if pygame.mouse.get_pressed(3)[0]:
                     pos_x, pos_y = pygame.mouse.get_pos()
                     #print((pos_x, pos_y))
+                    # description on the left
+                    if pos_x >= MARGIN + GAP and pos_x <= MARGIN + GAP + calendar.description_dims[0] \
+                    and pos_y >= HEIGHT - WIDTH - calendar.description_dims[1] and pos_y <= HEIGHT - WIDTH:
+                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.generate_months()
+                    # up arrow (previous content)
                     if pos_x >= UP_ARROW_LEFT_VERTEX[0] and pos_x <= UP_ARROW_RIGHT_VERTEX[0] \
                     and pos_y >= UP_ARROW_MIDDLE_VERTEX[1] and pos_y <= UP_ARROW_LEFT_VERTEX[1]:
                         if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
                             calendar.change_chosen_month(next=False)
+                        elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_year(next=False)
+                    # down arrow (next content)
                     if pos_x >= DOWN_ARROW_LEFT_VERTEX[0] and pos_x <= DOWN_ARROW_RIGHT_VERTEX[0] \
                     and pos_y >= DOWN_ARROW_LEFT_VERTEX[1] and pos_y <= DOWN_ARROW_MIDDLE_VERTEX[1]:
                         if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
                             calendar.change_chosen_month()
+                        elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_year()
+                    # big tiles (months)
+                    if pos_x >= MARGIN and pos_x <= WIDTH - MARGIN and pos_y >= HEIGHT - WIDTH + MARGIN \
+                    and pos_y <= HEIGHT - MARGIN - BIG_TILE_SIZE - GAP:
+                        if calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.choose_month(pos_x, pos_y)
 
         calendar.render()
 
