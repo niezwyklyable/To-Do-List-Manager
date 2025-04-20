@@ -378,6 +378,8 @@ def calendar_loop(WIN):
                     and pos_y >= HEIGHT - WIDTH - calendar.description_dims[1] and pos_y <= HEIGHT - WIDTH:
                         if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
                             calendar.generate_months()
+                        elif calendar.chosen_year and calendar.chosen_month and calendar.chosen_day:
+                            calendar.generate_chosen_month()
                     # up arrow (previous content)
                     if pos_x >= UP_ARROW_LEFT_VERTEX[0] and pos_x <= UP_ARROW_RIGHT_VERTEX[0] \
                     and pos_y >= UP_ARROW_MIDDLE_VERTEX[1] and pos_y <= UP_ARROW_LEFT_VERTEX[1]:
@@ -385,6 +387,8 @@ def calendar_loop(WIN):
                             calendar.change_chosen_month(next=False)
                         elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
                             calendar.change_chosen_year(next=False)
+                        elif calendar.chosen_year and calendar.chosen_month and calendar.chosen_day:
+                            calendar.change_chosen_day(next=False)
                     # down arrow (next content)
                     if pos_x >= DOWN_ARROW_LEFT_VERTEX[0] and pos_x <= DOWN_ARROW_RIGHT_VERTEX[0] \
                     and pos_y >= DOWN_ARROW_LEFT_VERTEX[1] and pos_y <= DOWN_ARROW_MIDDLE_VERTEX[1]:
@@ -392,11 +396,18 @@ def calendar_loop(WIN):
                             calendar.change_chosen_month()
                         elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
                             calendar.change_chosen_year()
+                        elif calendar.chosen_year and calendar.chosen_month and calendar.chosen_day:
+                            calendar.change_chosen_day()
                     # big tiles (months)
                     if pos_x >= MARGIN and pos_x <= WIDTH - MARGIN and pos_y >= HEIGHT - WIDTH + MARGIN \
                     and pos_y <= HEIGHT - MARGIN - BIG_TILE_SIZE - GAP:
                         if calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
                             calendar.choose_month(pos_x, pos_y)
+                    # regular tiles (days)
+                    if pos_x >= MARGIN and pos_x <= WIDTH - MARGIN and pos_y >= HEIGHT - WIDTH + MARGIN \
+                    and pos_y <= HEIGHT - MARGIN:
+                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.choose_day(pos_x, pos_y)
 
         calendar.render()
 

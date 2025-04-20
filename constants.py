@@ -6,6 +6,7 @@ HEIGHT = 560 # must be greater than WIDTH
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
+RED = (255, 0, 0)
 GAP = 5
 MARGIN = 20
 BOARD_SIZE = WIDTH - 2 * MARGIN
