@@ -376,37 +376,42 @@ def calendar_loop(WIN):
                     # description on the left
                     if pos_x >= MARGIN + GAP and pos_x <= MARGIN + GAP + calendar.description_dims[0] \
                     and pos_y >= HEIGHT - WIDTH - calendar.description_dims[1] and pos_y <= HEIGHT - WIDTH:
-                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
-                            calendar.generate_months()
+                        if calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.generate_chosen_decade()
+                        elif calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.generate_chosen_year()
                         elif calendar.chosen_year and calendar.chosen_month and calendar.chosen_day:
                             calendar.generate_chosen_month()
                     # up arrow (previous content)
                     if pos_x >= UP_ARROW_LEFT_VERTEX[0] and pos_x <= UP_ARROW_RIGHT_VERTEX[0] \
                     and pos_y >= UP_ARROW_MIDDLE_VERTEX[1] and pos_y <= UP_ARROW_LEFT_VERTEX[1]:
-                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
-                            calendar.change_chosen_month(next=False)
+                        if not calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_decade(next=False)
                         elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
                             calendar.change_chosen_year(next=False)
+                        elif calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_month(next=False)
                         elif calendar.chosen_year and calendar.chosen_month and calendar.chosen_day:
                             calendar.change_chosen_day(next=False)
                     # down arrow (next content)
                     if pos_x >= DOWN_ARROW_LEFT_VERTEX[0] and pos_x <= DOWN_ARROW_RIGHT_VERTEX[0] \
                     and pos_y >= DOWN_ARROW_LEFT_VERTEX[1] and pos_y <= DOWN_ARROW_MIDDLE_VERTEX[1]:
-                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
-                            calendar.change_chosen_month()
+                        if not calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_decade()
                         elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
                             calendar.change_chosen_year()
+                        elif calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                            calendar.change_chosen_month()
                         elif calendar.chosen_year and calendar.chosen_month and calendar.chosen_day:
                             calendar.change_chosen_day()
-                    # big tiles (months)
-                    if pos_x >= MARGIN and pos_x <= WIDTH - MARGIN and pos_y >= HEIGHT - WIDTH + MARGIN \
-                    and pos_y <= HEIGHT - MARGIN - BIG_TILE_SIZE - GAP:
-                        if calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
-                            calendar.choose_month(pos_x, pos_y)
-                    # regular tiles (days)
+                    # big tiles (years and month) and regular tiles (days) - generally the board
                     if pos_x >= MARGIN and pos_x <= WIDTH - MARGIN and pos_y >= HEIGHT - WIDTH + MARGIN \
                     and pos_y <= HEIGHT - MARGIN:
-                        if calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
+                        if not calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.choose_year(pos_x, pos_y)
+                        elif calendar.chosen_year and not calendar.chosen_month and not calendar.chosen_day:
+                            calendar.choose_month(pos_x, pos_y)
+                        elif calendar.chosen_year and calendar.chosen_month and not calendar.chosen_day:
                             calendar.choose_day(pos_x, pos_y)
 
         calendar.render()
