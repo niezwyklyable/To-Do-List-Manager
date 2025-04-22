@@ -3,10 +3,10 @@ import pygame
 from datetime import datetime
 from constants import BOARD_SIZE, GAP, WHITE, BLACK, MARGIN, HEIGHT, WIDTH, BLUE, TILE_SIZE, \
 UP_ARROW_LEFT_VERTEX, UP_ARROW_MIDDLE_VERTEX, UP_ARROW_RIGHT_VERTEX, DOWN_ARROW_LEFT_VERTEX, \
-DOWN_ARROW_MIDDLE_VERTEX, DOWN_ARROW_RIGHT_VERTEX, BIG_TILE_SIZE, RED
+DOWN_ARROW_MIDDLE_VERTEX, DOWN_ARROW_RIGHT_VERTEX, BIG_TILE_SIZE, RED, ORANGE, RADIUS, CYAN
 
 class Calendar():
-    def __init__(self, win):
+    def __init__(self, win, tasks):
         self.win = win
         self.current_datetime_obj = None
         self.current_year = 0
@@ -23,6 +23,15 @@ class Calendar():
         self.chosen_decade_list = []
         if self.chosen_year and self.chosen_month and not self.chosen_day:
             self.generate_chosen_month()
+        self.events = []
+        self.extract_events(tasks)
+        self.chosen_day_event_list = []
+
+    # extract events and deadlines from the all tasks
+    def extract_events(self, tasks):
+        for t in tasks:
+            if t.datetime_obj:
+                self.events.append(t)
 
     # due to highlight the current day, month and year in the calendar
     def update_current_datetime(self):
@@ -118,9 +127,17 @@ class Calendar():
                     color = BLUE
                 else:
                     color = BLACK
+                # draw the border of the big tile
                 pygame.draw.rect(self.win, color, (MARGIN + GAP + i*(BIG_TILE_SIZE+GAP), \
                     HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP), \
                     BIG_TILE_SIZE, BIG_TILE_SIZE), width=1)
+                # draw the events and deadlines as the points at the rendered year in the big tile area
+                for e in self.events:
+                    if self.chosen_decade == self.current_decade and \
+                    int(e.datetime_obj.strftime("%Y")) == self.chosen_decade_list[j][i]:
+                        pygame.draw.circle(self.win, ORANGE, (int(MARGIN + GAP + i*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE/2), \
+                            int(HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP) + 4/5*BIG_TILE_SIZE)), radius=RADIUS)
+                # draw the year number in the center of the big tile area
                 year = font.render(str(self.chosen_decade_list[j][i]), 1, color)
                 self.win.blit(year, (int(MARGIN + GAP + i*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE / 2 - year.get_width() / 2), \
                     int(HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE / 2 - year.get_height() / 2)))
@@ -136,9 +153,17 @@ class Calendar():
                     color = BLUE
                 else:
                     color = BLACK
+                # draw the border of the big tile
                 pygame.draw.rect(self.win, color, (MARGIN + GAP + i*(BIG_TILE_SIZE+GAP), \
                     HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP), \
                     BIG_TILE_SIZE, BIG_TILE_SIZE), width=1)
+                # draw the events and deadlines as the points at the rendered month in the big tile area
+                for e in self.events:
+                    if int(e.datetime_obj.strftime("%Y")) == self.chosen_year and \
+                    int(e.datetime_obj.strftime("%m")) == month_num_list[j][i]:
+                        pygame.draw.circle(self.win, ORANGE, (int(MARGIN + GAP + i*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE/2), \
+                            int(HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP) + 4/5*BIG_TILE_SIZE)), radius=RADIUS)
+                # draw the month name in the center of the big tile area
                 month = font.render(datetime(self.chosen_year, month_num_list[j][i], 1).strftime("%b"), 1, color) # Month name, short version
                 self.win.blit(month, (int(MARGIN + GAP + i*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE / 2 - month.get_width() / 2), \
                     int(HEIGHT - WIDTH + MARGIN + GAP + j*(BIG_TILE_SIZE+GAP) + BIG_TILE_SIZE / 2 - month.get_height() / 2)))
@@ -164,20 +189,46 @@ class Calendar():
                 color = BLUE
             else:
                 color = BLACK
+            # draw the border of the tile
             pygame.draw.rect(self.win, color, (MARGIN + GAP + (weekday_num-1)*(TILE_SIZE+GAP), \
                 HEIGHT - WIDTH + MARGIN + GAP + (j+1)*(TILE_SIZE+GAP), \
                 TILE_SIZE, TILE_SIZE), width=1)
+            # draw the events and deadlines as the points at the rendered day in the tile area
+            for e in self.events:
+                if int(e.datetime_obj.strftime("%Y")) == self.chosen_year and \
+                int(e.datetime_obj.strftime("%m")) == self.chosen_month and \
+                e.datetime_obj.strftime("%d") ==  day_obj.strftime("%d"):
+                    pygame.draw.circle(self.win, ORANGE, (int(MARGIN + GAP + (weekday_num-1)*(TILE_SIZE+GAP) + TILE_SIZE/2), \
+                         int(HEIGHT - WIDTH + MARGIN + GAP + (j+1)*(TILE_SIZE+GAP) + 4/5*TILE_SIZE)), radius=RADIUS)
+            # draw the day number in the center of the tile area
             day_num = font.render(str(int(day_obj.strftime("%d"))), 1, color) # Day of month 1-31
             self.win.blit(day_num, (int(MARGIN + GAP + (weekday_num-1)*(TILE_SIZE+GAP) + TILE_SIZE / 2 - day_num.get_width() / 2), \
                 int(HEIGHT - WIDTH + MARGIN + GAP + (j+1)*(TILE_SIZE+GAP) + TILE_SIZE / 2 - day_num.get_height() / 2)))
 
     def draw_chosen_day(self):
-        # to extend in the future
         font = pygame.font.SysFont('comicsans', 18)
-        # draw no task message
-        no_task_info = font.render('There is no tasks detected on the chosen day.', 1, RED)
-        self.win.blit(no_task_info, (int(MARGIN + BOARD_SIZE / 2 - no_task_info.get_width() / 2), \
-            int(HEIGHT - WIDTH + MARGIN)))
+        if self.chosen_day_event_list:
+            temp_counter = 0
+            for e in self.chosen_day_event_list:
+                # active task color settings
+                if e.state == 'to-do':
+                    color = CYAN
+                elif e.state == 'completed':
+                    color = BLUE
+                # with time
+                if e.time:
+                    info = font.render(f'#{e.task_number}: {e.time} - {e.target_info} | [{e.state}]', 1, color)
+                # without time
+                else:
+                    info = font.render(f'#{e.task_number}: {e.target_info} | [{e.state}]', 1, color)
+                self.win.blit(info, (int(MARGIN + GAP), \
+                    int(HEIGHT - WIDTH + MARGIN + GAP + temp_counter*info.get_height())))
+                temp_counter += 1
+        else:
+            # draw no task message
+            no_task_info = font.render('There is no tasks detected on the chosen day.', 1, RED)
+            self.win.blit(no_task_info, (int(MARGIN + GAP), \
+                int(HEIGHT - WIDTH + MARGIN + GAP)))
 
     def generate_last_day_of_month(self, month, year):
         if month in (1,3,5,7,8,10,12):
@@ -235,10 +286,31 @@ class Calendar():
             self.chosen_month_obj_list.append(datetime(self.chosen_year, self.chosen_month, i))
 
     def generate_chosen_day(self):
-        # in the future there will be checking if there are any tasks on the chosen day
-        # and generate them to the new attribute
-        pass
-
+        # extract events which happen only on the chosen day
+        self.chosen_day_event_list = []
+        for e in self.events:
+            if int(e.datetime_obj.strftime("%Y")) == self.chosen_year and \
+            int(e.datetime_obj.strftime("%m")) == self.chosen_month and \
+            int(e.datetime_obj.strftime("%d")) == self.chosen_day:
+                self.chosen_day_event_list.append(e)
+        if self.chosen_day_event_list == []:
+            return
+        # filtering and sorting events
+        temp_filtered_tasks = [] # with time
+        temp_filtered_tasks_without_time = []
+        for e in self.chosen_day_event_list:
+            if e.time == None:
+                temp_filtered_tasks_without_time.append(e) # append events without time
+            else:
+                temp_filtered_tasks.append(e) # append events which have be set time
+        # sort events with time only by time
+        sorted_temp_filtered_tasks_by_minutes = sorted(temp_filtered_tasks, key=lambda e: e.get_time()[1])
+        sorted_temp_filtered_tasks_by_hours = sorted(sorted_temp_filtered_tasks_by_minutes, key=lambda e: e.get_time()[0])
+        # concatenate two lists in specific order (events without time and events with time)
+        sorted_temp_filtered_tasks = temp_filtered_tasks_without_time + sorted_temp_filtered_tasks_by_hours
+        # sort all events by state (completed/to-do)
+        self.chosen_day_event_list = sorted(sorted_temp_filtered_tasks, key=lambda e: e.get_state())
+            
     def change_chosen_decade(self, next=True):
         all_years_list = self.generate_all_years_list()
         if next:

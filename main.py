@@ -255,7 +255,7 @@ def main():
             WIN = pygame.display.set_mode((WIDTH, HEIGHT))
             pygame.display.set_caption('To-Do List Manager - GUI')
             pygame.init()
-            calendar_loop(WIN)
+            calendar_loop(WIN, tasks)
 
         # Exit the app
         elif chosen_option == '6':
@@ -378,10 +378,10 @@ def automatic_date_assigning(datetime_obj, tasks):
         save_to_database(tasks)
 
 # GUI
-def calendar_loop(WIN):
+def calendar_loop(WIN, tasks):
     clock = pygame.time.Clock()
     run = True
-    calendar = Calendar(WIN)
+    calendar = Calendar(WIN, tasks)
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
