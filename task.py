@@ -3,6 +3,7 @@ import colorama
 from colorama import Fore
 colorama.init(autoreset=True)
 import re
+from datetime import datetime
 
 class Task():
     def __init__(self, task_number, target_info, date=None, assigned_day=None, \
@@ -16,6 +17,14 @@ class Task():
         self.time = time # str type or None
         self.task_type = task_type # str type or None
         self.active = active # boolean type
+        self.datetime_obj = None # datetime object or None
+        self.assign_datetime_obj()
+
+    def assign_datetime_obj(self):
+        if self.date:
+            self.datetime_obj = datetime(self.get_date()[2], self.get_date()[1], self.get_date()[0])
+        else:
+            self.datetime_obj = None
 
     def show_info(self):
         # inactive task (periodic without time only)
@@ -200,6 +209,7 @@ class Task():
                     self.time = None
                     self.active = True
                     self.task_type = task_type
+                    self.assign_datetime_obj()
                     print(f'{Fore.GREEN}The task has been modified properly.')
                     return True                   
                 else:
@@ -218,6 +228,7 @@ class Task():
                     self.time = time
                     self.active = True
                     self.task_type = task_type
+                    self.assign_datetime_obj()
                     print(f'{Fore.GREEN}The task has been modified properly.')
                     return True                   
             else:
@@ -227,3 +238,10 @@ class Task():
     def move_to_specific_assigned_day(self, assigned_day):
         self.date=None
         self.assigned_day=assigned_day
+
+    def set_date_from_datetime_obj(self):
+        self.assigned_day = None
+        day = self.datetime_obj.strftime("%d") # dd
+        month = self.datetime_obj.strftime("%m") # mm
+        year = self.datetime_obj.strftime("%Y") # yyyy
+        self.date = day + '.' + month + '.' + year
