@@ -65,25 +65,53 @@ def main():
             for t in sorted_temp_filtered_tasks_by_year:
                 t.show_info()
             print()
-            print('MONDAY:')
+            if datetime_obj.strftime("%a").lower() == 'mon':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}MONDAY:')
             show_tasks_on_specific_day('mon', tasks)
             print()
-            print('TUESDAY:')
+            if datetime_obj.strftime("%a").lower() == 'tue':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}TUESDAY:')
             show_tasks_on_specific_day('tue', tasks)
             print()
-            print('WEDNESDAY:')
+            if datetime_obj.strftime("%a").lower() == 'wed':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}WEDNESDAY:')
             show_tasks_on_specific_day('wed', tasks)
             print()
-            print('THURSDAY:')
+            if datetime_obj.strftime("%a").lower() == 'thu':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}THURSDAY:')
             show_tasks_on_specific_day('thu', tasks)
             print()
-            print('FRIDAY:')
+            if datetime_obj.strftime("%a").lower() == 'fri':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}FRIDAY:')
             show_tasks_on_specific_day('fri', tasks)
             print()
-            print('SATURDAY:')
+            if datetime_obj.strftime("%a").lower() == 'sat':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}SATURDAY:')
             show_tasks_on_specific_day('sat', tasks)
             print()
-            print('SUNDAY:')
+            if datetime_obj.strftime("%a").lower() == 'sun':
+                color = Fore.MAGENTA
+            else:
+                color = Fore.WHITE
+            print(f'{color}SUNDAY:')
             show_tasks_on_specific_day('sun', tasks)
 
         # Add a new task to the list
@@ -230,7 +258,7 @@ def main():
                         print(f'{Fore.GREEN}Target info has changed properly.')
                         save_to_database(tasks)
                     # Change the parameters
-                    if chosen_option == '2':
+                    elif chosen_option == '2':
                         is_properly_modified = t.change_parameters()
                         if is_properly_modified:
                             save_to_database(tasks)

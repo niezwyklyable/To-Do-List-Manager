@@ -53,18 +53,24 @@ class Task():
                     print(f'{color}Task #{self.task_number}: {self.date} - {self.target_info} | [{self.state}]')
         # without date
         else:
-            # with time
-            if self.time:
+            # no periodic with time
+            if not self.periodic and self.time:
                 if self.task_type:
                     print(f'{color}Task #{self.task_number}: {self.time} - {self.target_info} | [{self.state}] | [{self.task_type}]')
                 else:
                     print(f'{color}Task #{self.task_number}: {self.time} - {self.target_info} | [{self.state}]')
-            # without time
-            else:
+            # no periodic without time
+            elif not self.periodic and not self.time:
                 if self.task_type:
                     print(f'{color}Task #{self.task_number}: {self.target_info} | [{self.state}] | [{self.task_type}]')
                 else:
                     print(f'{color}Task #{self.task_number}: {self.target_info} | [{self.state}]')
+            # periodic with time
+            elif self.periodic and self.time:
+                print(f'{color}Task #{self.task_number}: {self.time} - {self.target_info} | [{self.state}] | [periodic]')
+            # periodic without time
+            elif self.periodic and not self.time:
+                print(f'{color}Task #{self.task_number}: {self.target_info} | [{self.state}] | [periodic]')
 
     def mark_as_completed(self):
         self.state = 'completed'
